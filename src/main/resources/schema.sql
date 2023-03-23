@@ -23,7 +23,9 @@ create table pet (
     species varchar(255) not null,
 --     age int unsigned not null default 0,
     age int not null default 0,
-    user_id int not null,
+    member_id int not null,
+    created_date timestamp,
+    last_modified_date timestamp,
     primary key (id),
-    foreign key (user_id) references member(id)
+    foreign key (member_id) references member(id)
 )
