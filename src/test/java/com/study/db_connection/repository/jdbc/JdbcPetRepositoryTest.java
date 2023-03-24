@@ -1,6 +1,7 @@
 package com.study.db_connection.repository.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.study.db_connection.entity.Address;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 @SpringBootTest
 @TestInstance(value = Lifecycle.PER_CLASS)
@@ -88,6 +90,36 @@ class JdbcPetRepositoryTest {
     }
 
     @Test
+    void findByIdFail_1() {
+        //given
+        Pet pet = Pet.builder()
+            .id(1L)
+            .name("Mung")
+            .species("dog")
+            .age(2)
+            .build();
+
+        //then
+        assertThatThrownBy(() -> petRepository.findById(pet.getId())).isInstanceOf(
+            NoSuchElementException.class);
+    }
+
+    @Test
+    void findByIdFail_2() {
+        //given
+        Pet pet = Pet.builder()
+            .name("Mung")
+            .species("dog")
+            .age(2)
+            .build();
+
+        //then
+        assertThatThrownBy(() -> petRepository.findById(pet.getId())).isInstanceOf(
+            InvalidDataAccessApiUsageException.class);
+    }
+
+
+    @Test
     void findAll() {
         //given
         Member findMember = memberRepository.findById(1L);
@@ -132,6 +164,18 @@ class JdbcPetRepositoryTest {
         assertThatThrownBy(() -> petRepository.findById(savedPet.getId()))
             .isInstanceOf(NoSuchElementException.class);
     }
+
+    @Test
+    void deleteByIdNotExistsPetId() {
+        assertThatNoException().isThrownBy(() -> petRepository.deleteById(100L));
+    }
+
+    @Test
+    void deleteByIdFail() {
+        assertThatThrownBy(() -> petRepository.deleteById(null)).isInstanceOf(
+            InvalidDataAccessApiUsageException.class);
+    }
+
 
     @Test
     void update() {

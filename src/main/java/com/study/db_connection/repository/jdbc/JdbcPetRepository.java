@@ -72,6 +72,9 @@ public class JdbcPetRepository {
     }
 
     public Pet findById(Long id) {
+        if (id == null) {
+            throw new IllegalStateException("id not nullable");
+        }
         String sql = "select * from pet where id = ?";
 
         Connection con = null;
@@ -154,6 +157,9 @@ public class JdbcPetRepository {
     }
 
     public void deleteById(Long id) {
+        if (id == null) {
+            throw new IllegalStateException("id not nullable");
+        }
         String sql = "delete from pet where id = ?";
 
         Connection con = null;
