@@ -180,7 +180,7 @@ public class JdbcPetRepository {
         boolean flag = false;
         boolean nameFlag = StringUtils.hasText(pet.getName());
         boolean speciesFlag = StringUtils.hasText(pet.getSpecies());
-        boolean ageFlag = pet.getAge() >= 0;
+        boolean ageFlag = pet.getAge() != null;
         boolean memberFlag = false;
         if (memberId != null) {
             // member 존재 여부 확인

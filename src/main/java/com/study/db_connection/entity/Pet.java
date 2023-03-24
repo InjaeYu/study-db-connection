@@ -24,7 +24,7 @@ public class Pet extends TimeEntity {
     private Long id;
     private String name;
     private String species;
-    private int age;
+    private Integer age;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @Setter
@@ -36,7 +36,7 @@ public class Pet extends TimeEntity {
         this.age = age;
     }
     @Builder
-    private Pet(Long id, String name, String species, int age, Member member) {
+    private Pet(Long id, String name, String species, Integer age, Member member) {
         this.id = id;
         this.name = name;
         this.species = species;
