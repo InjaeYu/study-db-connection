@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Repository
@@ -167,6 +168,95 @@ public class JdbcPetRepository {
         } finally {
             close(con, pstmt, rs);
         }
+    }
 
+    public Pet update(Long memberId, Pet pet) {
+        StringBuilder sqlBuilder = new StringBuilder("update pet set");
+        if (pet.getId() == null) {
+            throw new IllegalStateException("id not nullable");
+        }
+        boolean flag = false;
+        boolean nameFlag = StringUtils.hasText(pet.getName());
+        boolean speciesFlag = StringUtils.hasText(pet.getSpecies());
+        boolean ageFlag = pet.getAge() >= 0;
+        boolean memberFlag = false;
+        if (memberId != null) {
+            // member 존재 여부 확인
+            memberRepository.findById(memberId);
+            memberFlag = true;
+        }
+
+        if (nameFlag) {
+            if (flag) {
+                sqlBuilder.append(",");
+            }
+            sqlBuilder.append(" name = ?");
+            flag = true;
+        }
+        if (speciesFlag) {
+            if (flag) {
+                sqlBuilder.append(",");
+            }
+            sqlBuilder.append(" species = ?");
+            flag = true;
+        }
+        if (ageFlag) {
+            if (flag) {
+                sqlBuilder.append(",");
+            }
+            sqlBuilder.append(" age = ?");
+            flag = true;
+        }
+        if (memberFlag) {
+            if (flag) {
+                sqlBuilder.append(",");
+            }
+            sqlBuilder.append(" member_id = ?");
+            flag = true;
+        }
+        if (flag) {
+            sqlBuilder.append(",");
+        }
+        sqlBuilder.append(" last_modified_date = now()").append(" where id = ?");
+        String sql = sqlBuilder.toString();
+
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection();
+            con.setAutoCommit(false);
+
+            pstmt = con.prepareStatement(sql);
+            int index = 1;
+            if (nameFlag) {
+                pstmt.setString(index++, pet.getName());
+            }
+            if (speciesFlag) {
+                pstmt.setString(index++, pet.getSpecies());
+            }
+            if (ageFlag) {
+                pstmt.setInt(index++, pet.getAge());
+            }
+            if (memberFlag) {
+                pstmt.setLong(index++, memberId);
+            }
+            pstmt.setLong(index, pet.getId());
+            pstmt.executeUpdate();
+            con.commit();
+            return findById(pet.getId());
+        } catch (SQLException e) {
+            try {
+                if (con != null) {
+                    con.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Rollback fail", ex);
+            }
+            throw new IllegalStateException(e);
+        } finally {
+            close(con, pstmt, rs);
+        }
     }
 }

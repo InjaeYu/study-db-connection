@@ -132,4 +132,28 @@ class JdbcPetRepositoryTest {
         assertThatThrownBy(() -> petRepository.findById(savedPet.getId()))
             .isInstanceOf(NoSuchElementException.class);
     }
+
+    @Test
+    void update() {
+        //given
+        Member findMember = memberRepository.findById(1L);
+        Pet pet = new Pet("Mung", "dog", 1);
+        findMember.addPet(pet);
+        petRepository.save(findMember.getId(), pet);
+        Pet modifiedPet = Pet.builder()
+            .id(pet.getId())
+            .name("Mew")
+            .species("cat")
+            .age(2)
+            .build();
+
+        //when
+        Pet updatedPet = petRepository.update(findMember.getId(), modifiedPet);
+
+        //then
+        assertThat(updatedPet.getId()).isEqualTo(modifiedPet.getId());
+        assertThat(updatedPet.getName()).isEqualTo(modifiedPet.getName());
+        assertThat(updatedPet.getAge()).isEqualTo(modifiedPet.getAge());
+        assertThat(updatedPet.getSpecies()).isEqualTo(modifiedPet.getSpecies());
+    }
 }
