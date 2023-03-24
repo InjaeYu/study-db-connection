@@ -26,6 +26,7 @@ public class JdbcPetRepository {
     private final JdbcMemberRepository memberRepository;
 
     public Pet save(Long memberId, Pet pet) {
+        Member findMember = memberRepository.findById(memberId);
         String sql = "insert into"
             + " pet(name, species, age, member_id, created_date, last_modified_date)"
             + " values(?, ?, ?, ?, now(), now())";
@@ -50,6 +51,7 @@ public class JdbcPetRepository {
                 long id = rs.getLong(1);
                 pet.setId(id);
                 con.commit();
+                findMember.addPet(pet);
                 return pet;
             } else {
                 throw new IllegalStateException("Not Generated Key");
