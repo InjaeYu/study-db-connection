@@ -35,15 +35,14 @@ public class JdbcTemplateMemberRepository {
     }
 
     public Member save(Member member) {
-        SqlParameterSource param = getSqlParameterSource(member);
+        SqlParameterSource param = getParam(member);
 
         Number key = txTemplate.execute(status -> jdbcInsert.executeAndReturnKey(param));
-        if (key != null) {
-            member.setId(key.longValue());
-            return member;
-        } else {
+        if (key == null) {
             throw new IllegalStateException("Not Generated Key");
         }
+        member.setId(key.longValue());
+        return member;
     }
 
     public Member findById(Long id) {
@@ -77,7 +76,7 @@ public class JdbcTemplateMemberRepository {
             throw new IllegalStateException("id not nullable");
         }
         String sql = getUpdateSql(member);
-        SqlParameterSource param = getSqlParameterSource(member);
+        SqlParameterSource param = getParam(member);
         txTemplate.executeWithoutResult(status -> template.update(sql, param));
         return findById(member.getId());
     }
@@ -134,7 +133,7 @@ public class JdbcTemplateMemberRepository {
         return sqlBuilder.toString();
     }
 
-    private SqlParameterSource getSqlParameterSource(Member member) {
+    private SqlParameterSource getParam(Member member) {
         LocalDateTime now = LocalDateTime.now();
         return new MapSqlParameterSource()
             .addValue("id", member.getId())
