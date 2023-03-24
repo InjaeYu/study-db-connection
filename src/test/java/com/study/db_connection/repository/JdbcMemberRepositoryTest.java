@@ -121,4 +121,26 @@ class JdbcMemberRepositoryTest {
         assertThatThrownBy(() -> repository.findById(savedMember.getId())).isInstanceOf(
             NoSuchElementException.class);
     }
+
+    @Test
+    void update() {
+        //given
+        Member member = new Member("member1", 10, new Address("city1", "street1", "0000-0000"));
+        repository.save(member);
+        Member modifiedMember = new Member(member.getId(), "modifiedName", 20,
+            new Address("modifiedCity", "modifiedStreet", "1111-2222"));
+
+        //when
+        Member updatedMember = repository.update(modifiedMember);
+
+        //then
+        assertThat(updatedMember.getName()).isEqualTo(modifiedMember.getName());
+        assertThat(updatedMember.getAge()).isEqualTo(modifiedMember.getAge());
+        assertThat(updatedMember.getAddress().getCity()).isEqualTo(
+            modifiedMember.getAddress().getCity());
+        assertThat(updatedMember.getAddress().getStreet()).isEqualTo(
+            modifiedMember.getAddress().getStreet());
+        assertThat(updatedMember.getAddress().getZipCode()).isEqualTo(
+            modifiedMember.getAddress().getZipCode());
+    }
 }
