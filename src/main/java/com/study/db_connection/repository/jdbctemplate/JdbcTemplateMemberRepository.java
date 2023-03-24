@@ -46,6 +46,9 @@ public class JdbcTemplateMemberRepository {
     }
 
     public Member findById(Long id) {
+        if (id == null) {
+            throw new IllegalStateException("id not nullable");
+        }
         String sql = "select * from member where id = :id";
         Map<String, Object> param = Map.of("id", id);
         try {
@@ -66,6 +69,9 @@ public class JdbcTemplateMemberRepository {
     }
 
     public void deleteById(Long id) {
+        if (id == null) {
+            throw new IllegalStateException("id not nullable");
+        }
         String sql = "delete from member where id = :id";
         Map<String, Object> param = Map.of("id", id);
         template.update(sql, param);

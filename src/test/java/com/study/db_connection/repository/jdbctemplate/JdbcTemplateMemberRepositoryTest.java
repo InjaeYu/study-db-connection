@@ -1,6 +1,7 @@
 package com.study.db_connection.repository.jdbctemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.study.db_connection.entity.Address;
@@ -9,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 @SpringBootTest
 class JdbcTemplateMemberRepositoryTest {
@@ -74,6 +77,20 @@ class JdbcTemplateMemberRepositoryTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 유저 조회시 예외 발생")
+    void findByIdFail1() {
+        assertThatThrownBy(() -> repository.findById(100L)).isInstanceOf(
+            NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("null 조회시 예외 발생")
+    void findByIdFail2() {
+        assertThatThrownBy(() -> repository.findById(null)).isInstanceOf(
+            InvalidDataAccessApiUsageException.class);
+    }
+
+    @Test
     void findAll() {
         //given
         List<Member> memberList = new ArrayList<>();
@@ -120,6 +137,19 @@ class JdbcTemplateMemberRepositoryTest {
         //then
         assertThatThrownBy(() -> repository.findById(savedMember.getId())).isInstanceOf(
             NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저 삭제시 예외 발생하지 않음")
+    void deleteByIdNotExistsPetId() {
+        assertThatNoException().isThrownBy(() -> repository.deleteById(100L));
+    }
+
+    @Test
+    @DisplayName("null 삭제시 예외 발생")
+    void deleteByIdFail() {
+        assertThatThrownBy(() -> repository.deleteById(null)).isInstanceOf(
+            InvalidDataAccessApiUsageException.class);
     }
 
     @Test
