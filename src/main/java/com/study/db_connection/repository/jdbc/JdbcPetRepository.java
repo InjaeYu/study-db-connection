@@ -27,7 +27,7 @@ public class JdbcPetRepository {
     public Pet save(Long memberId, Pet pet) {
         String sql = "insert into"
             + " pet(name, species, age, member_id, created_date, last_modified_date)"
-            + " values(?, ?, ?, ?, ?, ?)";
+            + " values(?, ?, ?, ?, now(), now())";
 
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -42,14 +42,13 @@ public class JdbcPetRepository {
             pstmt.setString(2, pet.getSpecies());
             pstmt.setInt(3, pet.getAge());
             pstmt.setLong(4, memberId);
-            pstmt.setObject(5, pet.getCreatedDate());
-            pstmt.setObject(6, pet.getLastModifiedDate());
             pstmt.executeUpdate();
 
             rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 long id = rs.getLong(1);
                 pet.setId(id);
+                con.commit();
                 return pet;
             } else {
                 throw new IllegalStateException("Not Generated Key");
