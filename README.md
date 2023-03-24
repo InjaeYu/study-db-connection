@@ -16,4 +16,4 @@ JDBC, JPA, Spring Data JPA, Querydsl를 이용한 DB 연결 관련 스터디 진
 
 ## ERD
 
-<img width="1057" alt="image" src="https://user-images.githubusercontent.com/31715847/226807357-8909a0e9-f2a6-4ac0-a91b-e06608293569.png">
+<img width="1063" alt="image" src="https://user-images.githubusercontent.com/31715847/227404708-ed6cafc1-06d2-4f64-8c9d-adc5bc004f1c.png">
