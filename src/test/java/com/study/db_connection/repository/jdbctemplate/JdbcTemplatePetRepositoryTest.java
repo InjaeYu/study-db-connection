@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -88,31 +89,16 @@ class JdbcTemplatePetRepositoryTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 유저 조회시 예외 발생")
     void findByIdFail_1() {
-        //given
-        Pet pet = Pet.builder()
-            .id(1L)
-            .name("Mung")
-            .species("dog")
-            .age(2)
-            .build();
-
-        //then
-        assertThatThrownBy(() -> petRepository.findById(pet.getId())).isInstanceOf(
+        assertThatThrownBy(() -> petRepository.findById(100L)).isInstanceOf(
             NoSuchElementException.class);
     }
 
     @Test
+    @DisplayName("null 조회시 예외 발생")
     void findByIdFail_2() {
-        //given
-        Pet pet = Pet.builder()
-            .name("Mung")
-            .species("dog")
-            .age(2)
-            .build();
-
-        //then
-        assertThatThrownBy(() -> petRepository.findById(pet.getId())).isInstanceOf(
+        assertThatThrownBy(() -> petRepository.findById(null)).isInstanceOf(
             InvalidDataAccessApiUsageException.class);
     }
 
@@ -163,11 +149,13 @@ class JdbcTemplatePetRepositoryTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 유저 삭제시 예외 발생하지 않음")
     void deleteByIdNotExistsPetId() {
         assertThatNoException().isThrownBy(() -> petRepository.deleteById(100L));
     }
 
     @Test
+    @DisplayName("null 삭제시 예외 발생")
     void deleteByIdFail() {
         assertThatThrownBy(() -> petRepository.deleteById(null)).isInstanceOf(
             InvalidDataAccessApiUsageException.class);
