@@ -4,6 +4,7 @@ import com.study.db_connection.audit.TimeEntity;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Getter
@@ -22,7 +24,7 @@ import lombok.ToString;
 public class Member extends TimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter
     private Long id;
 
@@ -57,6 +59,18 @@ public class Member extends TimeEntity {
                 this.getPets().add(pet);
             }
             pet.setMember(this);
+        }
+    }
+
+    public void update(String name, int age, Address address) {
+        if (StringUtils.hasText(name)) {
+            this.name = name;
+        }
+        if (age > 0) {
+            this.age = age;
+        }
+        if (address != null) {
+            this.address.update(address);
         }
     }
 }
