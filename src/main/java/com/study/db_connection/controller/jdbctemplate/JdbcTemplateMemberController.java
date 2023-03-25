@@ -1,9 +1,12 @@
 package com.study.db_connection.controller.jdbctemplate;
 
+import static com.study.db_connection.controller.mapper.MemberMapper.getMember;
+import static com.study.db_connection.controller.mapper.MemberMapper.getResponseDto;
+
 import com.study.db_connection.controller.dto.MemberResponseDto;
 import com.study.db_connection.controller.dto.MemberSaveDto;
 import com.study.db_connection.controller.dto.ResponseDto;
-import com.study.db_connection.entity.Address;
+import com.study.db_connection.controller.mapper.MemberMapper;
 import com.study.db_connection.entity.Member;
 import com.study.db_connection.service.jdbctemplate.JdbcTemplateMemberService;
 import java.util.List;
@@ -23,16 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/jdbc-template/members")
 public class JdbcTemplateMemberController {
+
     private final JdbcTemplateMemberService service;
 
     @PostMapping
     public ResponseEntity<ResponseDto> save(@RequestBody MemberSaveDto requestBody) {
-        Member member = new Member(requestBody.getName(), requestBody.getAge(),
-            new Address(requestBody.getCity(), requestBody.getStreet(), requestBody.getZipCode()));
-        Member save = service.save(member);
-        MemberResponseDto responseDto = new MemberResponseDto(save.getId(), save.getName(),
-            save.getAge(), save.getAddress());
-        return new ResponseEntity<>(new ResponseDto(responseDto), HttpStatus.CREATED);
+        Member member = getMember(requestBody);
+        Member savedMember = service.save(member);
+        return new ResponseEntity<>(new ResponseDto(getResponseDto(savedMember)),
+            HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -45,11 +47,7 @@ public class JdbcTemplateMemberController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDto> findById(@PathVariable("id") Long id) {
         Member findMember = service.findById(id);
-        MemberResponseDto responseDto = new MemberResponseDto(findMember.getId(),
-            findMember.getName(),
-            findMember.getAge(),
-            findMember.getAddress());
-        return new ResponseEntity<>(new ResponseDto(responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDto(getResponseDto(findMember)), HttpStatus.OK);
     }
 
 
@@ -57,7 +55,7 @@ public class JdbcTemplateMemberController {
     public ResponseEntity<ResponseDto> findAll() {
         List<Member> members = service.findAll();
         List<MemberResponseDto> result = members.stream()
-            .map(m -> new MemberResponseDto(m.getId(), m.getName(), m.getAge(), m.getAddress()))
+            .map(MemberMapper::getResponseDto)
             .toList();
         return new ResponseEntity<>(new ResponseDto(result), HttpStatus.OK);
     }
@@ -65,12 +63,9 @@ public class JdbcTemplateMemberController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseDto> update(@PathVariable("id") Long id,
         @RequestBody MemberSaveDto requestBody) {
-        Member member = new Member(id, requestBody.getName(), requestBody.getAge(),
-            new Address(requestBody.getCity(), requestBody.getStreet(), requestBody.getZipCode()));
+        Member member = getMember(id, requestBody);
         Member updatedMember = service.update(member);
-        MemberResponseDto responseDto = new MemberResponseDto(updatedMember.getId(),
-            updatedMember.getName(), updatedMember.getAge(), updatedMember.getAddress());
-        return new ResponseEntity<>(new ResponseDto(responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDto(getResponseDto(updatedMember)), HttpStatus.OK);
     }
 
 }
