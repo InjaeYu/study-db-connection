@@ -20,5 +20,12 @@ public class GlobalRestControllerAdvice {
         return new ResponseDto(errorDto);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseDto badRequestExceptionHandler(HttpServletRequest request, RuntimeException e) {
+        ErrorDto errorDto = new ErrorDto(HttpStatus.BAD_REQUEST.toString(), e.getMessage(),
+            request.getRequestURI());
+        return new ResponseDto(errorDto);
+    }
 
 }
