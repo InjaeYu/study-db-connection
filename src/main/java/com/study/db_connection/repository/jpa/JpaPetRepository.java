@@ -28,11 +28,13 @@ public class JpaPetRepository {
         if (id == null) {
             throw new IllegalArgumentException("Id not nullable");
         }
-        return em.find(Pet.class, id);
+        List<Pet> result = em.createQuery("select p from Pet p join fetch p.member", Pet.class)
+            .getResultList();
+        return result.size() == 0 ? null : result.get(0);
     }
 
     public List<Pet> findAll() {
-        return em.createQuery("select p from Pet p", Pet.class).getResultList();
+        return em.createQuery("select p from Pet p join fetch p.member", Pet.class).getResultList();
     }
 
     @Transactional

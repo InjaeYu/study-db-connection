@@ -1,6 +1,8 @@
 package com.study.db_connection.controller.dto;
 
 import com.study.db_connection.entity.Address;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -13,6 +15,8 @@ public class MemberResponseDto {
     private String city;
     private String street;
     private String zipCode;
+
+    private List<PetResponseDto> pets = new ArrayList<>();
 
     public MemberResponseDto(Long id, String name, int age, Address address) {
         this.id = id;

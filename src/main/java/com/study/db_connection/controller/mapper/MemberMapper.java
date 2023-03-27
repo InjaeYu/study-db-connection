@@ -27,7 +27,9 @@ public class MemberMapper {
     }
 
     public static MemberResponseDto getResponseDto(Member member) {
-        return new MemberResponseDto(member.getId(), member.getName(),
+        MemberResponseDto responseDto = new MemberResponseDto(member.getId(), member.getName(),
             member.getAge(), member.getAddress());
+        member.getPets().forEach(p -> responseDto.getPets().add(PetMapper.getResponseDto(p)));
+        return responseDto;
     }
 }
