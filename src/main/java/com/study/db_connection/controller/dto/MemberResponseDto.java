@@ -16,7 +16,7 @@ public class MemberResponseDto {
     private String street;
     private String zipCode;
 
-    private List<PetResponseDto> pets = new ArrayList<>();
+    private List<PetInnerResponseDto> pets = new ArrayList<>();
 
     public MemberResponseDto(Long id, String name, int age, Address address) {
         this.id = id;
