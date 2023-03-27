@@ -29,10 +29,13 @@ class JdbcPetRepositoryTest {
     @Autowired
     JdbcPetRepository petRepository;
 
+    Long defaultMemberId = null;
+
     @BeforeAll
     void dataInit() {
         Member member = new Member("member1", 20, new Address("city", "street", "0000-0000"));
         memberRepository.save(member);
+        defaultMemberId = member.getId();
     }
 
     @BeforeEach
@@ -43,7 +46,7 @@ class JdbcPetRepositoryTest {
     @Test
     void save() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         Pet pet = new Pet("Mung", "dog", 2);
         findMember.addPet(pet);
 
@@ -61,7 +64,7 @@ class JdbcPetRepositoryTest {
     @Test
     void saveFail() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         Pet pet = new Pet(null, "dog", 2);
         findMember.addPet(pet);
 
@@ -74,7 +77,7 @@ class JdbcPetRepositoryTest {
     @Test
     void findById() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         Pet pet = new Pet("Mung", "dog", 2);
         findMember.addPet(pet);
         petRepository.save(findMember.getId(), pet);
@@ -108,7 +111,7 @@ class JdbcPetRepositoryTest {
     @Test
     void findAll() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         List<Pet> petList = new ArrayList<>();
         for (int i = 1; i < 11; i++) {
             Pet pet = new Pet("petName" + i, "species" + i, i);
@@ -138,7 +141,7 @@ class JdbcPetRepositoryTest {
     @Test
     void deleteById() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         Pet pet = new Pet("Mung", "dog", 2);
         findMember.addPet(pet);
         Pet savedPet = petRepository.save(findMember.getId(), pet);
@@ -168,7 +171,7 @@ class JdbcPetRepositoryTest {
     @Test
     void update() {
         //given
-        Member findMember = memberRepository.findById(1L);
+        Member findMember = memberRepository.findById(defaultMemberId);
         Pet pet = new Pet("Mung", "dog", 1);
         findMember.addPet(pet);
         petRepository.save(findMember.getId(), pet);
