@@ -1,6 +1,7 @@
 package com.study.db_connection.entity;
 
 import com.study.db_connection.audit.TimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class Member extends TimeEntity {
 
     private String name;
     private int age;
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private final List<Pet> pets = new ArrayList<>();
 
     @Embedded
