@@ -2,7 +2,9 @@ package com.study.db_connection.repository.jdbctemplate;
 
 import com.study.db_connection.entity.Address;
 import com.study.db_connection.entity.Member;
+import com.study.db_connection.entity.Pet;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -49,10 +51,20 @@ public class JdbcTemplateMemberRepository {
         if (id == null) {
             throw new IllegalStateException("id not nullable");
         }
-        String sql = "select * from member where id = :id";
         Map<String, Object> param = Map.of("id", id);
+        String sql = "select * from pet where member_id = :id";
+        List<Pet> petList = template.query(sql, param, petRowMapper());
+        for (Pet pet : petList) {
+            System.out.println("pet : " + pet.getId());
+        }
+
+        sql = "select * from member m where id = :id";
         try {
-            return template.queryForObject(sql, param, memberRowMapper());
+            Member member = template.queryForObject(sql, param, memberRowMapper());
+            if (member != null) {
+                member.getPets().addAll(petList);
+            }
+            return member;
         } catch (DataAccessException e) {
             throw new NoSuchElementException("Member not found(id : " + id + ")", e);
         }
@@ -60,7 +72,26 @@ public class JdbcTemplateMemberRepository {
 
     public List<Member> findAll() {
         String sql = "select * from member";
-        return template.query(sql, Map.of(), memberRowMapper());
+        List<Member> userList = template.query(sql, Map.of(), memberRowMapper());
+        List<Long> idList = userList.stream().map(Member::getId).toList();
+
+        StringBuilder sqlBuilder = new StringBuilder("select * from pet where member_id in (");
+        Iterator<Long> iter = idList.iterator();
+        while (iter.hasNext()) {
+            sqlBuilder.append(iter.next());
+            if (iter.hasNext()) {
+                sqlBuilder.append(", ");
+            }
+        }
+        sqlBuilder.append(")");
+
+        List<Pet> petList = template.query(sqlBuilder.toString(), Map.of(), petRowMapper());
+        userList.forEach(m -> petList.forEach(p -> {
+            if (p.getMember().getId().equals(m.getId())) {
+                m.getPets().add(p);
+            }
+        }));
+        return userList;
     }
 
     public void deleteAll() {
@@ -167,5 +198,15 @@ public class JdbcTemplateMemberRepository {
             member.setLastModifiedDate(rs.getTimestamp("last_modified_date").toLocalDateTime());
             return member;
         };
+    }
+
+    private RowMapper<Pet> petRowMapper() {
+        return (rs, rowNum) -> Pet.builder()
+            .id(rs.getLong("id"))
+            .name(rs.getString("name"))
+            .species(rs.getString("species"))
+            .age(rs.getInt("age"))
+            .member(new Member(rs.getLong("member_id"), null, 0, null))
+            .build();
     }
 }
