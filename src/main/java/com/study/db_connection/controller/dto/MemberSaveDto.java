@@ -11,4 +11,11 @@ public class MemberSaveDto {
     private String street;
     private String zipCode;
 
+    public MemberSaveDto(String name, int age, String city, String street, String zipCode) {
+        this.name = name;
+        this.age = age;
+        this.city = city;
+        this.street = street;
+        this.zipCode = zipCode;
+    }
 }
